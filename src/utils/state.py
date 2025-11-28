@@ -9,7 +9,8 @@ class AgentState(TypedDict):
     duration: Optional[float]  # in seconds
     
     # Analysis results (stored as dictionaries matching the Pydantic models)
-    pronunciation_analysis: Optional[Dict[str, Any]]
+    pronunciation_analysis: Optional[Dict[str, Any]]  # Fluency analysis
+    pronunciation_quality_analysis: Optional[Dict[str, Any]]  # Pronunciation analysis
     grammar_analysis: Optional[Dict[str, Any]]
     vocabulary_analysis: Optional[Dict[str, Any]]
     

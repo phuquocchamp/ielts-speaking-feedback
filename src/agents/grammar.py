@@ -32,9 +32,13 @@ def analyze_grammar(state: AgentState) -> AgentState:
             Transcript: {transcript}
             
             Provide a structured assessment including:
-            1. Grammar Score (0-9)
-            2. List of Errors (with corrections and explanations)
-            3. General Feedback
+            1. score (0-9): Grammar score based on IELTS criteria
+            2. evaluation: List of evaluation details with criteria (e.g., 'Strengths', 'Weaknesses', 'Improvements') and detailed descriptions
+            3. errors: List of grammatical errors found with:
+               - original: The incorrect text
+               - suggested: The corrected version
+               - explanation: Explanation of the grammatical error
+            4. feedback: General feedback on grammatical range and accuracy
             """)
         ])
         

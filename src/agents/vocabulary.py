@@ -32,9 +32,13 @@ def analyze_vocabulary(state: AgentState) -> AgentState:
             Transcript: {transcript}
             
             Provide a structured assessment including:
-            1. Vocabulary Score (0-9)
-            2. Suggestions for improvement (better synonyms/idioms)
-            3. General Feedback
+            1. score (0-9): Vocabulary score based on IELTS criteria
+            2. evaluation: List of evaluation details with criteria (e.g., 'Strengths', 'Weaknesses', 'Improvements') and detailed descriptions
+            3. errors: List of vocabulary improvements with:
+               - original: The word or phrase used
+               - suggested: A better synonym, idiom, or more advanced vocabulary
+               - explanation: Context and reason for the suggestion
+            4. feedback: General feedback on lexical resource
             """)
         ])
         

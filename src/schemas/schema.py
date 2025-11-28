@@ -1,40 +1,41 @@
-from typing import List, Optional
+from typing import List, Optional, Dict
 from pydantic import BaseModel, Field
 
-class PronunciationFeedback(BaseModel):
-    wpm: float = Field(description="Words per minute calculation")
-    fluency_score: float = Field(description="Estimated fluency score 0-9")
-    pronunciation_score: float = Field(description="Estimated pronunciation score 0-9")
-    feedback: str = Field(description="Detailed feedback on pronunciation and fluency")
+class ErrorDetail(BaseModel):
+    original: str = Field(description="The original text with error")
+    suggested: str = Field(description="The suggested correction")
+    explanation: str = Field(description="Explanation of the error and correction")
 
-class GrammarError(BaseModel):
-    error: str = Field(description="The grammatical error found")
-    correction: str = Field(description="The corrected version")
-    explanation: str = Field(description="Explanation of the error")
+class EvaluationDetail(BaseModel):
+    criteria: str = Field(description="The evaluation criteria (e.g., Strengths, Weaknesses, Improvements)")
+    description: str = Field(description="Detailed description for this criteria")
 
-class GrammarFeedback(BaseModel):
-    grammar_score: float = Field(description="Estimated grammar score 0-9")
-    errors: List[GrammarError] = Field(description="List of grammatical errors found")
-    feedback: str = Field(description="General feedback on grammatical range and accuracy")
+class SectionFeedback(BaseModel):
+    score: float = Field(description="Score for this section (0-9)")
+    evaluation: List[EvaluationDetail] = Field(default_factory=list, description="Evaluation details by level/criteria")
+    errors: List[ErrorDetail] = Field(default_factory=list, description="List of errors found in this section")
+    feedback: str = Field(default="", description="Overall feedback for this section")
 
-class VocabularySuggestion(BaseModel):
-    original: str = Field(description="The original word or phrase used")
-    suggestion: str = Field(description="A better synonym or idiom")
-    context: str = Field(description="How to use the suggestion")
+class FluencyFeedback(SectionFeedback):
+    wpm: Optional[float] = Field(default=None, description="Words per minute calculation")
 
-class VocabularyFeedback(BaseModel):
-    vocabulary_score: float = Field(description="Estimated vocabulary score 0-9")
-    suggestions: List[VocabularySuggestion] = Field(description="List of vocabulary suggestions")
-    feedback: str = Field(description="General feedback on lexical resource")
+class PronunciationFeedback(SectionFeedback):
+    pass
 
-class DetailedBreakdown(BaseModel):
-    fluency_and_coherence: PronunciationFeedback
-    lexical_resource: VocabularyFeedback
-    grammatical_range_and_accuracy: GrammarFeedback
-    pronunciation: PronunciationFeedback # Reusing PronunciationFeedback for simplicity, or separate if needed
+class GrammarFeedback(SectionFeedback):
+    pass
+
+class VocabularyFeedback(SectionFeedback):
+    pass
+
+class DetailsFeedback(BaseModel):
+    fluency: FluencyFeedback = Field(description="Fluency and coherence feedback")
+    pronunciation: PronunciationFeedback = Field(description="Pronunciation feedback")
+    grammar: GrammarFeedback = Field(description="Grammatical range and accuracy feedback")
+    vocabulary: VocabularyFeedback = Field(description="Lexical resource feedback")
 
 class IELTSFeedback(BaseModel):
-    overall_band_score: float = Field(description="Overall IELTS Band Score 0-9")
+    overall_score: float = Field(description="Overall IELTS Band Score (0-9)")
     transcript: str = Field(description="Transcribed text from the audio")
-    detailed_breakdown: DetailedBreakdown
-    general_suggestions: List[str] = Field(description="General suggestions for improvement")
+    details: DetailsFeedback = Field(description="Detailed breakdown by section")
+    general_suggestions: List[str] = Field(default_factory=list, description="General suggestions for improvement")

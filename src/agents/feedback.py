@@ -16,7 +16,8 @@ def generate_feedback(state: AgentState) -> AgentState:
         log_step(logger, agent_name, "STARTED")
         
         transcript = state.get("transcript", "")
-        pronunciation = state.get("pronunciation_analysis", {})
+        fluency = state.get("pronunciation_analysis", {})
+        pronunciation = state.get("pronunciation_quality_analysis", {})
         grammar = state.get("grammar_analysis", {})
         vocabulary = state.get("vocabulary_analysis", {})
         
@@ -35,7 +36,11 @@ def generate_feedback(state: AgentState) -> AgentState:
             Transcript: {transcript}
             
             ---
-            Pronunciation & Fluency Analysis:
+            Fluency Analysis:
+            {fluency}
+            
+            ---
+            Pronunciation Analysis:
             {pronunciation}
             
             ---
@@ -49,15 +54,23 @@ def generate_feedback(state: AgentState) -> AgentState:
             ---
             
             Provide a structured output including:
-            1. Overall Band Score (0-9)
-            2. Detailed Breakdown (Fluency, Lexical, Grammar, Pronunciation) - You can reuse the sub-scores or adjust them for the final holistic score.
-            3. General Suggestions for Improvement
+            1. overall_score (0-9): The overall IELTS band score
+            2. transcript: The original transcript
+            3. details: Contains four sections (fluency, pronunciation, grammar, vocabulary) - use the analyzed data above
+               - For fluency: use the fluency analysis provided
+               - For pronunciation: use the pronunciation analysis provided
+               - For grammar: use the grammar analysis provided
+               - For vocabulary: use the vocabulary analysis provided
+            4. general_suggestions: List of general improvement suggestions
+            
+            Note: Each section in details should have score, evaluation, errors, and feedback fields.
             """)
         ])
         
         chain = prompt | structured_llm
         response = chain.invoke({
             "transcript": transcript,
+            "fluency": fluency,
             "pronunciation": pronunciation,
             "grammar": grammar,
             "vocabulary": vocabulary
