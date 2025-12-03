@@ -3,6 +3,7 @@ import shutil
 import uuid
 import time
 from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi.middleware.cors import CORSMiddleware
 from src.workflows.wf_speaking_feedback import create_graph
 from src.schemas.schema import IELTSFeedback
 from src.utils.logger import setup_logger, log_step
@@ -11,6 +12,15 @@ import uvicorn
 logger = setup_logger(__name__)
 
 app = FastAPI(title="IELTS Speaking Feedback API")
+
+# Enable CORS
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=["*"],  # Allow all origins (for development; restrict in production)
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
 
 @app.post("/process/speaking", response_model=IELTSFeedback)
 async def process_speaking(file: UploadFile = File(...)):
@@ -21,11 +31,12 @@ async def process_speaking(file: UploadFile = File(...)):
     
     logger.info("=" * 80)
     logger.info(f"[REQUEST {request_id}] Processing audio: {file.filename}")
+    logger.info(f"[REQUEST {request_id}] Content-Type: {file.content_type}")
     logger.info("=" * 80)
     
     # Validate file type
     if not file.filename.lower().endswith(('.mp3', '.wav', '.m4a', '.ogg')):
-        logger.error(f"[REQUEST {request_id}] Invalid file format")
+        logger.error(f"[REQUEST {request_id}] Invalid file format: {file.filename}")
         raise HTTPException(status_code=400, detail="Invalid file format. Please upload an audio file.")
     
     # Save uploaded file temporarily
