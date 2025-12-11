@@ -7,6 +7,7 @@ class AgentState(TypedDict):
     audio_path: str
     transcript: Optional[str]
     duration: Optional[float]  # in seconds
+    questions: Optional[list[str]]  # List of questions asked
     
     # Analysis results (stored as dictionaries matching the Pydantic models)
     pronunciation_analysis: Optional[Dict[str, Any]]  # Fluency analysis

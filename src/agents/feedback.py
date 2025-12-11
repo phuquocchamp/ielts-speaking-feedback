@@ -14,12 +14,14 @@ def generate_feedback(state: AgentState) -> AgentState:
     
     try:
         log_step(logger, agent_name, "STARTED")
-        
+
         transcript = state.get("transcript", "")
         fluency = state.get("pronunciation_analysis", {})
         pronunciation = state.get("pronunciation_quality_analysis", {})
         grammar = state.get("grammar_analysis", {})
+
         vocabulary = state.get("vocabulary_analysis", {})
+        questions = state.get("questions", [])
         
         if not transcript:
             log_step(logger, agent_name, "SKIPPED")
@@ -34,6 +36,9 @@ def generate_feedback(state: AgentState) -> AgentState:
             Based on the following analyses, provide a final IELTS Speaking Report.
             
             Transcript: {transcript}
+            
+            Questions Asked:
+            {questions}
             
             ---
             Fluency Analysis:
@@ -73,10 +78,14 @@ def generate_feedback(state: AgentState) -> AgentState:
             "fluency": fluency,
             "pronunciation": pronunciation,
             "grammar": grammar,
-            "vocabulary": vocabulary
+
+            "vocabulary": vocabulary,
+            "questions": "\n".join(f"- {q}" for q in questions) if questions else "No specific questions provided."
         })
         
-        result = {"final_feedback": response.model_dump()}
+        response_data = response.model_dump()
+        response_data["questions"] = questions
+        result = {"final_feedback": response_data}
         
         log_step(logger, agent_name, "COMPLETED")
         return result

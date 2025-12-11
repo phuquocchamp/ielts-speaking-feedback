@@ -36,6 +36,7 @@ class DetailsFeedback(BaseModel):
 
 class IELTSFeedback(BaseModel):
     overall_score: float = Field(description="Overall IELTS Band Score (0-9)")
+    questions: List[str] = Field(default_factory=list, description="List of questions asked")
     transcript: str = Field(description="Transcribed text from the audio")
     details: DetailsFeedback = Field(description="Detailed breakdown by section")
     general_suggestions: List[str] = Field(default_factory=list, description="General suggestions for improvement")

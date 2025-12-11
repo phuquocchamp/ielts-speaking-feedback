@@ -2,7 +2,8 @@ import os
 import shutil
 import uuid
 import time
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Form
+from typing import List, Optional
 from fastapi.middleware.cors import CORSMiddleware
 from src.workflows.wf_speaking_feedback import create_graph
 from src.schemas.schema import IELTSFeedback
@@ -23,10 +24,15 @@ app.add_middleware(
 )
 
 @app.post("/process/speaking", response_model=IELTSFeedback)
-async def process_speaking(file: UploadFile = File(...)):
+async def process_speaking(
+    file: UploadFile = File(...),
+    questions: Optional[List[str]] = Form(None)
+):
     """
     Process an audio file and return IELTS speaking feedback.
     """
+
+
     request_id = str(uuid.uuid4())[:8]
     
     logger.info("=" * 80)
@@ -34,6 +40,7 @@ async def process_speaking(file: UploadFile = File(...)):
     logger.info(f"[REQUEST {request_id}] Content-Type: {file.content_type}")
     logger.info("=" * 80)
     
+    logger.info(f"Questions: {questions}")
     # Validate file type
     if not file.filename.lower().endswith(('.mp3', '.wav', '.m4a', '.ogg')):
         logger.error(f"[REQUEST {request_id}] Invalid file format: {file.filename}")
@@ -54,7 +61,8 @@ async def process_speaking(file: UploadFile = File(...)):
         log_step(logger, f"[REQUEST {request_id}] Workflow Execution", "STARTED")
         
         initial_state = {
-            "audio_path": temp_path
+            "audio_path": temp_path,
+            "questions": questions or []
         }
         
         result = graph.invoke(initial_state)

@@ -36,6 +36,7 @@ def create_graph():
     workflow.add_edge("transcribe", "analyze_vocabulary")
     
     # After all analyses are done, generate feedback
+    workflow.add_edge("transcribe", "generate_feedback")
     workflow.add_edge("analyze_fluency", "generate_feedback")
     workflow.add_edge("analyze_pronunciation", "generate_feedback")
     workflow.add_edge("analyze_grammar", "generate_feedback")
